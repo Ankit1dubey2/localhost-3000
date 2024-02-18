@@ -2,7 +2,7 @@ import React from "react";
 
 const Header = () => {
   return (
-    <div className=" w-screen px-[6vw] py-3 bg-zinc-800 flex flex-col gap-4 text-white border-b border-b-zinc-400">
+    <div className=" w-screen px-[6vw] py-3 bg-zinc-800 flex flex-col gap-4 text-white border-b border-b-zinc-400 relative">
       <nav className=" flex justify-between items-center text-white  ">
         <span>BeatMarket</span>
         <div className=" border border-zinc-400 rounded-lg flex items-center justify-center absolute left-[50%] translate-x-[-50%]">
