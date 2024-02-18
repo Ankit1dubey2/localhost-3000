@@ -1,0 +1,11 @@
+{
+  "title": "Ankit Dubey",
+  "producerId": "123456",
+  "producerName": "BeatMaster",
+  "tempo": 120,
+  "mood": "Upbeat",
+  "genre": "Funk",
+  "instrument": "Bass Guitar, Drums, Electric Piano",
+  "price": 29.99,
+  "coverImageUrl": "https://unsplash.com/photos/selective-focus-silhouette-photography-of-man-playing-red-lighted-dj-terminal-YrtFlrLo2DQ"
+}

@@ -2,6 +2,7 @@ const bcrypt=require('bcrypt');
 const user=require('../model/user');
 const jwt=require("jsonwebtoken");
 const { use } = require('../routes/user');
+const upload = require('../middleware/upload');
 require('dotenv').config();
 
 exports.signup=async(req,res)=>{
@@ -100,3 +101,39 @@ exports.login=async(req,res)=>{
         });
     }
 }
+
+
+
+exports.getUserProfile=async(req, res)=>{
+    const userId = req.params.id;
+    try {
+        const exist = await user.findById(userId);
+
+        if (exist) {
+            res.json(exist); 
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } 
+    catch (err) {
+        console.error(err);
+        res.status(500).json(
+            { 
+                error: 'Internal server error' 
+            }
+            );
+    }
+}
+
+
+
+exports.uploadBeat = (req, res) => {
+    const beatFile = req.file;
+    res.status(200).json(
+        { 
+            message: 'Beat uploaded successfully', file: beatFile 
+        }
+    );
+};
+
+
