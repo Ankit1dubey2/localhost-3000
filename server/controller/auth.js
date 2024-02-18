@@ -3,6 +3,8 @@ const user=require('../model/user');
 const jwt=require("jsonwebtoken");
 const { use } = require('../routes/user');
 const upload = require('../middleware/upload');
+const Beat = require('../model/beat');
+const mongoose=require('mongoose');
 require('dotenv').config();
 
 exports.signup=async(req,res)=>{
@@ -126,14 +128,161 @@ exports.getUserProfile=async(req, res)=>{
 }
 
 
+exports.uploadBeat = async (req, res) => {
+    try {
 
-exports.uploadBeat = (req, res) => {
-    const beatFile = req.file;
-    res.status(200).json(
-        { 
-            message: 'Beat uploaded successfully', file: beatFile 
-        }
-    );
+        const { title, producerName, tempo, mood, genre, instrument, price, coverImageUrl } = req.body;
+
+        const producerId = new mongoose.Types.ObjectId();
+        const newBeat = new Beat({
+            title,
+            producerId,
+            producerName,
+            tempo,
+            mood,
+            genre,
+            instrument,
+            price,
+            coverImageUrl
+        });
+
+        await newBeat.save();
+
+        res.status(201).json({ message: 'Beat uploaded successfully', beat: newBeat });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
+
+
+exports.getBeatById = async (req, res) => {
+    try {
+        const beatId = req.params.id;
+        const beat = await Beat.findById(beatId);
+
+        if (!beat) {
+            return res.status(404).json({ error: 'Beat not found' });
+        }
+
+        res.json(beat);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+exports.getAllBeats = async (req, res) => {
+    try {
+        const beats = await Beat.find();
+        res.status(200).json(beats);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+exports.purchaseBeat = async (req, res) => {
+    try {
+        const beatId = req.params.id;
+        const userId = req.body.userId; // Assuming you pass the user ID in the request body
+
+        const beat = await Beat.findById(beatId);
+        if (!beat) {
+            return res.status(404).json({ error: 'Beat not found' });
+        }
+
+        // Update the beat document with purchaser information
+        beat.purchaser = userId;
+        await beat.save();
+
+        return res.status(200).json({ message: 'Beat purchased successfully', beat });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+exports.getPurchasedBeats = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        const exist = await user.findById(userId);
+        if (!exist) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const purchasedBeats = await Beat.find({ purchaserId: userId });
+
+        res.status(200).json(purchasedBeats);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+// exports.addBeat = async (req, res) => {
+//     try {
+//         const { title, userId } = req.body;
+//         const beat = new Beat({ title });
+//         await beat.save();
+        
+//         const exist = await user.findById(userId);
+//         if (!exist) {
+//             return res.status(404).json({ error: 'User not found' });
+//         }
+        
+//         exist.beat = beat._id;
+//         await exist.save();
+
+//         res.status(201).json({ message: 'Beat added successfully', beat });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// };
+
+
+// exports.addBeat = async (req, res) => {
+//     try {
+//         const { title, coverImageUrl, price, instrument, genre, mood, tempo, producerName, producerId } = req.body;
+        
+//         // Create a new Beat object with all the required fields
+//         const beat = new Beat({ 
+//             title,
+//             coverImageUrl,
+//             price,
+//             instrument,
+//             genre,
+//             mood,
+//             tempo,
+//             producerName,
+//             producerId
+//         });
+
+//         // Save the Beat to the database
+//         await beat.save();
+        
+//         // Find the user by userId
+//         const exist = await User.findById(producerId);
+//         if (!exist) {
+//             return res.status(404).json({ error: 'User not found' });
+//         }
+        
+//         // Associate the beat with the user
+//         exist.beats.push(beat._id);
+//         await exist.save();
+
+//         // Return a success response
+//         res.status(201).json({ message: 'Beat added successfully', beat });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// };
 
 

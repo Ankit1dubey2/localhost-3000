@@ -14,7 +14,11 @@ const userschema=new mongoose.Schema({
     password:{
         type:String,
         required:true,
-    }
+    },
+    beats: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Beat'
+    }]
 })
 
 module.exports=mongoose.model("user",userschema);
